@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.base_user import BaseUserManager
+from phonenumber_field.modelfields import PhoneNumberField
 
 class UserManager(BaseUserManager):
     use_in_migrations = True
@@ -25,6 +26,12 @@ class UserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+class Profile(models.Model):
+    picture = models.ImageField(upload_to="profile/pictures/")
+    name = models.CharField(max_length=63)
+    surname = models.CharField(max_length=63)
+    phone = PhoneNumberField()
+
 class User(AbstractUser):
     email = models.EmailField(unique=True)
     username = models.CharField(
@@ -33,9 +40,10 @@ class User(AbstractUser):
         null=True,
         blank=True,
     )
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
     
     objects = UserManager()
-
     
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+    
